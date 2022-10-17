@@ -141,4 +141,4 @@ I thank all of you who read my article and who accompany me in the creation of m
 [ArchUnit](https://www.archunit.org/getting-started), has great documentation and helps me a lot in the projects I run in my day to day, what do you think about presenting this in your projects? :)
 
 - Linkedin: https://www.linkedin.com/in/gabriel-augusto-1b4914145/
-- Dev.io: https://github.com/GabrielAugusto1996/apply-archunit
+- Dev.io: https://dev.to/gabrielaugusto1996/architectural-tests-standardize-your-projects-architecture-now-51db
