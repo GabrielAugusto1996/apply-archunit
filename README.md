@@ -1,41 +1,42 @@
-# Introdução
+# Introduction
 
 ![image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ch5qxnnb24ajcarwjxza.png)
 
-Muita das vezes quando iniciamos um projeto, a maior dificuldade que possuímos é no momento de fazer a organização entre os nossos pacotes, classes e definições de qual classe poderá ter acesso a determinada outra classe, após derrotarmos essa dificuldade, o nosso próximo desafio é mantermos essa organização e documentarmos para os futuros desenvolvedores ou até mesmo nós, como definimos a arquitetura do nosso projeto, isso é o que você irá ver a seguir!
+Many times when we start a project, the biggest difficulty we have is when organizing our packages, classes and definitions of which class can have access to a certain other class, after defeating this difficulty, our next challenge is to maintain this organization and document for future developers or even us, how we defined the architecture of our project, this is what you will see next!
 
-# Por quê Testes Arquiteturais?
+# Why Architectural Testing?
 
-![image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/9oa5262hws7pnosoo3do.png)
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/30bdjmei0heqm1xxom62.png)
 
-Como foi dito anteriormente, além de organizarmos mais o nosso projeto e definirmos uma convenção, conseguimos ter uma documentação de uma forma bem amigável,conforme exemplo visto abaixo, vimos uma regra informando onde as classes anotadas com **Entity** deverão residir:
+As mentioned before, in addition to organizing our project more and defining a convention, we managed to have documentation in a very friendly way, as seen below, we saw a rule informing where the classes annotated with **Entity** should reside:
 
 ```java
 @ArchTest
-static final ArchRule entities_must_reside_in_a_domain_package =
-        classes().that().areAnnotatedWith(Entity.class).should().resideInAPackage("..domain..")
-        .as("Entidades deverão residir no pacote de domínios");
+    static final ArchRule entities_must_reside_in_a_domain_package =
+            classes().that().areAnnotatedWith(Entity.class).should().resideInAPackage("..domain..")
+                    .as("Entities must reside in the domain package");
 ```
-Mas que tal agora colocarmos a mão na massa? :)
 
-# Quais tecnologias iremos utilizar?
+But how about we get our hands-on now? :)
+
+# What technologies will we use?
 
 ![image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ngn93gk3iqvmt26uvys9.png)
 
-Para esse artigo em questão, iremos precisar ter as seguintes tecnologias no nosso projeto:
+For this article in question, we will need to have the following technologies in our project:
 
-1. [Java 8+](https://www.java.com/pt-BR/download/help/whatis_java.html): Linguagem de Programação Java na versão 8+
-2. [Maven](https://maven.apache.org/): Ferramenta para o gerenciamento de dependências no Java.
-3. [ArchUnit](https://www.archunit.org/): Ferramenta que será utilizada para o desenvolvimento dos nossos testes arquiteturais
-4. [Spring](https://spring.io/): Framework de programação
+1. [Java 8+](https://www.java.com/pt-BR/download/help/whatis_java.html): Java Programming Language in version 8+
+2. [Maven](https://maven.apache.org/): Dependency management tool in Java.
+3. [ArchUnit](https://www.archunit.org/): Tool that will be used for the development of our architectural tests
+4. [Spring](https://spring.io/): Programming framework
 
-Não irei entrar muito adentro de todas as tecnologias utilizadas pois não é o nosso objetivo desse artigo.
+I will not go into too much of all the technologies used because it is not our purpose of this article.
 
-## Configurando o nosso projeto:
+## Setting up our project:
 
 ![image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/vc5dbouy55a2xq6iyn5z.png)
 
-Para que possamos utilizar o **archunit** no nosso projeto, será necessário adicionarmos a seguinte dependência:
+In order for us to use **archunit** in our project, we will need to add the following dependency:
 
 ```xml
 <dependency>
@@ -45,95 +46,99 @@ Para que possamos utilizar o **archunit** no nosso projeto, será necessário ad
     <scope>test</scope>
 </dependency>
 ```
-Após isso, iremos fazer uma criação de uma única classe chamada **ArchitectureTest** no nosso pacote de testes, no qual irá ter a seguinte implementação nesse primeiro momento:
+
+After that, we will create a single class called **ArchitectureTest** in our test package, which will have the following implementation at this first moment:
 
 ```java
 
 @AnalyzeClasses(
-        packages = "SeuPacote",
+        packages = "YourPackage",
         importOptions = ImportOption.DoNotIncludeTests.class
 )
 public class ArchitectureTest {
 }
 ```
-**Observação:** No exemplo acima, foi inserido uma opção para que não incluísse os testes na nossa validação, mas caso você queira definir um padrão no nome dos seus testes também, pode ficar à vontade. :)
 
-# Agora sim, vamos ao que nos interessa! =D
+**Note:** In the example above, an option was inserted so that the tests were not included in our validation, but if you want to define a pattern in the name of your tests too, feel free. :)
 
-![image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/r5ijbphlme995jvlam0b.png)
+# Now, let's get to what interests us! =D
 
-Juntos, iremos definir uma arquitetura simples na qual iremos ter classes de **Controller** que irão poder chamar apenas as classes **Service** e que poderão chamar somente classes **Repository**, conforme visto no desenho abaixo:
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/wju6w43jd9ilcgf3341b.png)
+
+Together, we will define a simple architecture in which we will have **Controller** classes that will only be able to call **Service** classes and that will only be able to call **Repository** classes, as seen in the drawing below:
 
 ![image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/3waa6n7a3gn6hnfsbpw6.png)
 
-Após isso, iremos definir como irá ficar o nome de cada classe e por último, qual será o pacote que a mesma irá residir, dito isso, vamos criar a nossa arquitetura? :)
+After that, we will define how the name of each class will look and finally, what will be the package that it will reside in, that said, let's create our architecture? :)
 
-# Definindo o nome das nossas classes:
+# Defining the name of our classes:
 
 ![image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/o28rw5zmucv52lfvx23z.png)
 
-No 1º passo iremos definir como deverá ser o nome das nossas classes, já que somos pessoas extremamente criativas, vamos utilizar o nome de cada anotação no final da nossa classe, porquê será que ninguém nunca pensou nisso antes? :D
+In the 1st step we will define what the name of our classes should be, since we are extremely creative people, we are going to use the name of each annotation at the end of our class, why has no one ever thought of this before? :D
 
 ```java
     @ArchTest
-    static ArchRule ClassesQuePossuemAnotacaoController_DeveraoFinalizarComNomeController =
+    static ArchRule ClassesThatHaveControllerAnnotation_MustEndWithControllerName =
             classes()
                     .that().areAnnotatedWith(Controller.class)
                     .should().haveSimpleNameEndingWith("Controller")
-            .as("Caro desenvolvedor, todas as nossas classes que estão anotadas como Controller, deverão ter o nome finalizado com Controller");
+            .as("Dear developer, all our classes that are annotated as Controller, must have the name finalized with Controller");
 ```
 
-Como visto acima, o uso dos testes do **ArchUnit** são bem simples e bastante intuitivos, dentro do nosso teste estamos informando que toda classe que está anotada como **Controller**, deverá ter o nome finalizado como **Controller** e além disso deixamos uma dica para o próximo desenvolvedor que não fizer da forma que nós planejamos, utilizando o ".as(....)", isso não é legal? :)
+As seen above, the use of **ArchUnit** tests are very simple and very intuitive, within our test we are informing that every class that is annotated as **Controller**, must have the name finalized as **Controller* * and in addition we leave a tip for the next developer who doesn't do it the way we planned, using ".as(....)", isn't that cool? :)
 
-Forcei um erro, mudando o nome da nossa classe para **UsuarioJoao**, olha que legal o que aconteceu:
+I forced an error, changing the name of our class to **UserJohn**, look how cool what happened:
 
-![image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/lwmqwciz20ztka9e63t6.png)
 
-Após isso, basta criarmos as regras para as nossas outras classes, mas isso agora eu deixo para você tentar :)
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/jr6m9hh77rb49b5xe31z.png)
 
-Caso não consiga não se preocupe, basta abrir o [GitHub](https://github.com/GabrielAugusto1996/aplicando-archunit) do projeto :)
+After that, we just create the rules for our other classes, but that's for you to try :)
 
-# Definindo a residência das nossas classes:
+If you can't, don't worry, just open the project's [GitHub](https://github.com/GabrielAugusto1996/apply-archunit) :)
+
+# Defining the residence of our classes:
 
 ![image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/miwqb0ul4jxdmhqdusrt.png)
 
-No 2º passo iremos definir onde cada classe irá residir, o teste irá ser bastante similar ao anterior, então vamos lá? :)
+In the 2nd step we will define where each class will reside, the test will be very similar to the previous one, so let's go? :)
 
 ```java
 @ArchTest
-    static ArchRule ClassesQuePossuemAnotacaoController_DeveraoResidirNoPacoteController =
+    static ArchRule ClassesThatHaveControllerAnnotation_MustResideInTheControllerPackage =
             classes()
                     .that().areAnnotatedWith(Controller.class)
                     .should().resideInAPackage("..controller..")
-                    .as("Caro desenvolvedor, todas as nossas classes que estão anotadas como Controller, deverão residir no pacote *.controller");
+                    .as("Dear developer, all our classes that are annotated as Controller, must reside in the *.controller package");
 ```
 
-Com o exemplo acima, informamos no ".resideInAPackage(...)", qual será o local que a nossa classe de fato irá residir.
+With the example above, we inform in ".resideInAPackage(...)", which will be the place where our class will actually reside.
 
-# Definindo qual classe irá chamar qual classe:
+# Defining which class will call which class:
 
 ![image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/t3rc7mpw5stpdqie13cv.png)
 
-Por último, para concluirmos o nosso desafio, precisamos definir qual classe irá chamar a outra, para que dessa forma, tenhamos o controle de qual classe poderá conhecer a outra, para isso iremos seguir o exemplo abaixo:
+Finally, to conclude our challenge, we need to define which class will call the other one, so that in this way, we have control of which class will be able to know the other, for that we will follow the example below:
 
 ```java
 
-@ArchTest
-static final ArchRule ClassesQueResidemNoPacoteControllerNaoPodemConhecerRepository =
-        noClasses().that().resideInAPackage("..controller..")
-        .should().dependOnClassesThat().resideInAPackage("..repository..")
-        .as("As classes Repository não podem ficar juntas das classes Controller :(");
+ @ArchTest
+    static final ArchRule ClassesResidingInControllerPackageCannotKnowRepository =
+            noClasses().that().resideInAPackage("..controller..")
+                    .should().dependOnClassesThat().resideInAPackage("..repository..")
+            .as("Repository classes cannot be together with Controller classes :(");
 
 ```
-No exemplo acima, definimos que nenhuma classe que resida no pacote **Controller** poderá depender de nenhuma classe que resida no pacote **Repository**, que história triste de amor, não? :D
 
-# Obrigado pessoal =D
+In the example above, we defined that no class that resides in the **Controller** package can depend on any class that resides in the **Repository** package, what a sad love story, isn't it? :D
+
+# Thanks guys =D
 
 ![image](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/n7hbpeodptbcdpqoxds0.png)
 
-Agradeço a todos vocês que leram o meu artigo e que me acompanham na criação dos meus conteúdos :)
+I thank all of you who read my article and who accompany me in the creation of my content :)
 
-O [ArchUnit](https://www.archunit.org/getting-started), possui uma ótima documentação e me ajuda muito nos projetos que executo no meu dia à dia, o que você acha de apresentar isso nos seus projetos? :)
+[ArchUnit](https://www.archunit.org/getting-started), has great documentation and helps me a lot in the projects I run in my day to day, what do you think about presenting this in your projects? :)
 
 - Linkedin: https://www.linkedin.com/in/gabriel-augusto-1b4914145/
-- GitHub: https://github.com/GabrielAugusto1996/aplicando-archunit 
+- Dev.io: https://github.com/GabrielAugusto1996/apply-archunit
